@@ -141,3 +141,4 @@ src/
 - البريد الإلكتروني: info@classystore.mr
 - الهاتف: +222 45 25 25 25# classyn
 # classy
+# classy
