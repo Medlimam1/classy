@@ -34,7 +34,7 @@ export async function PUT(request: NextRequest) {
       include: {
         product: {
           select: {
-            inventory: true,
+            quantity: true,
           }
         }
       }
@@ -48,7 +48,7 @@ export async function PUT(request: NextRequest) {
     }
 
     // Check inventory
-    if (quantity > cartItem.product.inventory) {
+    if (quantity > cartItem.product.quantity) {
       return NextResponse.json(
         { error: 'Insufficient inventory' },
         { status: 400 }

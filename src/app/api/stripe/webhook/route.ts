@@ -19,8 +19,9 @@ export async function POST(request: NextRequest) {
 
     try {
       event = stripe.webhooks.constructEvent(body, signature, webhookSecret)
-    } catch (err: any) {
-      console.error('Webhook signature verification failed:', err.message)
+    } catch (err) {
+      const e = err as Error
+      console.error('Webhook signature verification failed:', e.message)
       return NextResponse.json(
         { error: 'Invalid signature' },
         { status: 400 }
@@ -91,8 +92,10 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent) {
     const total = subtotal + tax + shipping
 
     // Create order
+    const orderNumber = `ORD-${Date.now()}`
     const order = await prisma.order.create({
       data: {
+        orderNumber,
         userId,
         status: 'PAID',
         subtotal,
@@ -107,7 +110,6 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent) {
             variantId: item.variantId,
             quantity: item.quantity,
             price: item.variant?.price || item.product.price,
-            name: item.product.name,
           }))
         }
       }
@@ -120,9 +122,9 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent) {
         provider: 'STRIPE',
         status: 'COMPLETED',
         amount: total,
-        currency: 'USD',
+        currency: (process.env.DEFAULT_CURRENCY || 'MRU'),
         transactionId: paymentIntent.id,
-        metadata: paymentIntent as any,
+        metadata: paymentIntent as unknown as object,
       }
     })
 
@@ -136,7 +138,7 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent) {
       await prisma.product.update({
         where: { id: item.productId },
         data: {
-          inventory: {
+          quantity: {
             decrement: item.quantity
           }
         }

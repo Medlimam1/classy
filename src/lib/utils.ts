@@ -7,13 +7,32 @@ export function cn(...inputs: ClassValue[]) {
 
 export function formatPrice(
   price: number,
-  currency: string = 'USD',
-  locale: string = 'en-US'
+  currency?: string,
+  locale?: string
 ): string {
-  return new Intl.NumberFormat(locale, {
-    style: 'currency',
-    currency,
-  }).format(price)
+  // Default currency from env or MRU (Ouguiya)
+  const currencyCode = currency || process.env.NEXT_PUBLIC_DEFAULT_CURRENCY || process.env.DEFAULT_CURRENCY || 'MRU'
+
+  // Accept short locales like 'en' or 'ar' and map to full locales for Intl
+  let intlLocale = 'en-US'
+  if (locale) {
+    if (locale === 'ar') intlLocale = 'ar-MR'
+    else if (locale === 'en') intlLocale = 'en-US'
+    else intlLocale = locale
+  } else if (process.env.DEFAULT_LOCALE) {
+    intlLocale = process.env.DEFAULT_LOCALE === 'ar' ? 'ar-MR' : 'en-US'
+  }
+
+  try {
+    return new Intl.NumberFormat(intlLocale, {
+      style: 'currency',
+      currency: currencyCode,
+    }).format(price)
+  } catch (err) {
+    // Fallback: simple formatted number with currency code
+    console.error('[formatPrice] Intl format failed:', err)
+    return `${price.toFixed(2)} ${currencyCode}`
+  }
 }
 
 export function formatDate(

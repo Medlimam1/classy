@@ -4,9 +4,7 @@ import { authOptions } from '@/lib/auth'
 import { getCart } from '@/lib/cart'
 import Stripe from 'stripe'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-06-20',
-})
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
 export async function POST(request: NextRequest) {
   try {
@@ -30,9 +28,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Create payment intent
+    const defaultCurrency = (process.env.DEFAULT_CURRENCY || 'MRU').toLowerCase()
     const paymentIntent = await stripe.paymentIntents.create({
       amount: Math.round(cartSummary.total * 100), // Convert to cents
-      currency: 'usd',
+      currency: defaultCurrency,
       metadata: {
         userId: session.user.id,
         itemCount: cartSummary.itemCount.toString(),

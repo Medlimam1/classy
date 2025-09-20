@@ -41,6 +41,11 @@
     "logout": "تسجيل الخروج",
     "admin": "لوحة الإدارة"
   },
+
+  "wishlist": {
+    "itemAdded": "تمت إضافة المنتج إلى المفضلة",
+    "addError": "فشل في إضافة المنتج إلى المفضلة"
+  },
   "hero": {
     "title": "أزياء أنيقة",
     "subtitle": "للرجل العصري",
@@ -65,6 +70,8 @@
     "featured": "المنتجات المميزة",
     "featuredSubtitle": "قطع مختارة بعناية من أحدث مجموعاتنا",
     "addToCart": "أضف للسلة",
+    "addToWishlist": "أضف للمفضلة",
+    "maxQuantity": "أقصى كمية",
     "viewAll": "عرض جميع المنتجات",
     "outOfStock": "نفد من المخزون",
     "inStock": "متوفر",
@@ -72,7 +79,19 @@
     "comparePrice": "قارن بـ",
     "reviews": "التقييمات",
     "rating": "التقييم",
-    "writeReview": "اكتب تقييماً"
+    "writeReview": "اكتب تقييماً",
+    "relatedProducts": "منتجات متعلقة"
+  },
+  "reviews": {
+    "title": "آراء العملاء",
+    "writeReview": "اكتب تقييماً",
+    "noReviews": "لا توجد تقييمات حتى الآن",
+    "submitted": "تم إرسال التقييم",
+    "submitError": "فشل في إرسال التقييم",
+    "rating": "التقييم",
+    "comment": "التعليق",
+    "commentPlaceholder": "اكتب تقييمك هنا...",
+    "submit": "إرسال"
   },
   "newsletter": {
     "title": "ابق على اطلاع",
@@ -121,6 +140,8 @@
   "cart": {
     "title": "سلة التسوق",
     "empty": "سلتك فارغة",
+    "enterCoupon": "أدخل رمز الكوبون",
+    "freeShipping": "شحن مجاني",
     "continueShopping": "متابعة التسوق",
     "checkout": "إتمام الطلب",
     "subtotal": "المجموع الفرعي",
@@ -133,17 +154,22 @@
     "applyCoupon": "تطبيق كوبون",
     "couponCode": "رمز الكوبون",
     "invalidCoupon": "رمز كوبون غير صحيح",
-    "couponApplied": "تم تطبيق الكوبون بنجاح"
+    "couponApplied": "تم تطبيق الكوبون بنجاح",
+    "orderSummary": "ملخص الطلب",
+    "discount": "الخصم"
   },
   "checkout": {
     "title": "إتمام الطلب",
     "shippingAddress": "عنوان الشحن",
+    "review": "مراجعة الطلب",
+    "cashOnDelivery": "الدفع عند الاستلام",
     "billingAddress": "عنوان الفوترة",
     "sameAsBilling": "نفس عنوان الشحن",
     "paymentMethod": "طريقة الدفع",
     "orderSummary": "ملخص الطلب",
     "placeOrder": "تأكيد الطلب",
     "processing": "جاري المعالجة...",
+    "secureCheckout": "خيار دفع آمن",
     "firstName": "الاسم الأول",
     "lastName": "اسم العائلة",
     "company": "الشركة (اختياري)",
@@ -170,7 +196,26 @@
     "shippingAddress": "عنوان الشحن",
     "billingAddress": "عنوان الفوترة",
     "paymentMethod": "طريقة الدفع",
-    "orderItems": "عناصر الطلب"
+    "orderItems": "عناصر الطلب",
+    "placedOn": "تم إنشاؤه في",
+    "statusNew": "جديد",
+    "statusPending": "قيد الانتظار",
+    "statusPaid": "مدفوع",
+    "statusFulfilled": "مكتمل",
+    "statusCancelled": "ملغي",
+    "orderPlaced": "تم وضع الطلب",
+    "paymentConfirmed": "تم تأكيد الدفع",
+    "orderDelivered": "تم تسليم الطلب",
+    "each": "لكل",
+    "orderSummary": "ملخص الطلب",
+    "paymentInformation": "معلومات الدفع",
+    "method": "الطريقة",
+    "amount": "المبلغ",
+    "transactionId": "معرّف العملية",
+    "shippingInformation": "معلومات الشحن",
+    "carrier": "شركة الشحن",
+    "trackingNumber": "رقم التتبع",
+    "shippedOn": "تاريخ الشحن"
   },
   "admin": {
     "dashboard": "لوحة التحكم",
@@ -196,5 +241,15 @@
     "featured": "مميز",
     "published": "منشور",
     "draft": "مسودة"
+  }
+  ,
+  "account": {
+    "editProfile": "تعديل الملف",
+    "changePassword": "تغيير كلمة المرور",
+    "addresses": "عناويني",
+    "orders": "طلباتي",
+    "editProfilePlaceholder": "هنا يمكنك تعديل بيانات ملفك الشخصي (نموذج).",
+    "changePasswordPlaceholder": "قم بتغيير كلمة المرور الخاصة بك هنا (نموذج).",
+    "addressesPlaceholder": "قم بإدارة عناوينك المحفوظة هنا (نموذج)."
   }
 }

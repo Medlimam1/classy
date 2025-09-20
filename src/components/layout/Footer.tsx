@@ -25,18 +25,18 @@ export default function Footer() {
   ]
 
   return (
-    <footer className="bg-gray-900 text-white">
+    <footer className="bg-gradient-to-tr from-gray-900 via-gray-800 to-gray-900 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company Info */}
-          <div>
+          <div className="text-left rtl:text-right">
             <h3 className="text-2xl font-bold text-amber-400 mb-4">
               Classy Store
             </h3>
             <p className="text-gray-300 mb-4">
               {t('footer.aboutUs')} - {t('hero.subtitle')}
             </p>
-            <div className="flex space-x-4 rtl:space-x-reverse">
+            <div className="flex space-x-4 rtl:space-x-reverse justify-start rtl:justify-end">
               <a href="#" className="text-gray-400 hover:text-amber-400 transition-colors">
                 <Facebook className="h-5 w-5" />
               </a>
@@ -113,16 +113,23 @@ export default function Footer() {
               <p className="text-gray-400 text-xs mb-3">
                 {t('footer.subscribeNewsletter')}
               </p>
-              <div className="flex">
+              <form className="flex" onSubmit={(e) => e.preventDefault()}>
+                <label htmlFor="newsletter-email" className="sr-only">{t('footer.enterEmail')}</label>
                 <input
+                  id="newsletter-email"
                   type="email"
                   placeholder={t('footer.enterEmail')}
-                  className="flex-1 px-3 py-2 bg-gray-800 text-white text-sm rounded-l-md border border-gray-700 focus:outline-none focus:border-amber-400"
+                  className="flex-1 px-3 py-2 bg-gray-800 text-white text-sm rounded-l-md border border-gray-700 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                  aria-label={t('footer.enterEmail')}
                 />
-                <button className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-sm rounded-r-md transition-colors">
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-sm rounded-r-md transition-colors"
+                  aria-label={t('footer.subscribe')}
+                >
                   {t('footer.subscribe')}
                 </button>
-              </div>
+              </form>
             </div>
           </div>
         </div>

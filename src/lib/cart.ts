@@ -71,10 +71,30 @@ export async function getCart(userId: string): Promise<CartSummary> {
       itemCount: 0,
     }
   }
+  // Convert Prisma Decimal values to plain numbers for the client
+  const items: CartItem[] = cart.items.map((it: any) => ({
+    id: it.id,
+    productId: it.productId,
+    variantId: it.variantId || undefined,
+    quantity: it.quantity,
+    product: {
+      id: it.product.id,
+      name: it.product.name,
+      // price may be Decimal from Prisma
+      price: typeof it.product.price === 'object' && it.product.price?.toNumber ? it.product.price.toNumber() : Number(it.product.price),
+      images: it.product.images || [],
+      slug: it.product.slug,
+    },
+    variant: it.variant ? {
+      id: it.variant.id,
+      name: it.variant.name,
+      value: it.variant.value,
+      price: typeof it.variant.price === 'object' && it.variant.price?.toNumber ? it.variant.price.toNumber() : (it.variant.price == null ? undefined : Number(it.variant.price)),
+    } : undefined,
+  }))
 
-  const items = cart.items as CartItem[]
   const subtotal = calculateSubtotal(items)
-  const discount = cart.discount || 0
+  const discount = typeof cart.discount === 'object' && cart.discount?.toNumber ? cart.discount.toNumber() : Number(cart.discount || 0)
   const tax = calculateTax(subtotal - discount)
   const shipping = calculateShippingCost(subtotal)
   const total = subtotal + tax + shipping - discount
@@ -88,6 +108,29 @@ export async function getCart(userId: string): Promise<CartSummary> {
     discount,
     total,
     itemCount,
+  }
+}
+
+// Helper: convert raw prisma cartItem include result into plain CartItem
+function serializeCartItemRaw(it: any): CartItem {
+  return {
+    id: it.id,
+    productId: it.productId,
+    variantId: it.variantId || undefined,
+    quantity: it.quantity,
+    product: {
+      id: it.product.id,
+      name: it.product.name,
+      price: typeof it.product.price === 'object' && it.product.price?.toNumber ? it.product.price.toNumber() : Number(it.product.price),
+      images: it.product.images || [],
+      slug: it.product.slug,
+    },
+    variant: it.variant ? {
+      id: it.variant.id,
+      name: it.variant.name,
+      value: it.variant.value,
+      price: it.variant.price == null ? undefined : (typeof it.variant.price === 'object' && it.variant.price?.toNumber ? it.variant.price.toNumber() : Number(it.variant.price)),
+    } : undefined,
   }
 }
 
@@ -142,7 +185,7 @@ export async function addToCart(
         }
       }
     })
-    return updatedItem as CartItem
+    return serializeCartItemRaw(updatedItem)
   } else {
     // Create new cart item
     const newItem = await prisma.cartItem.create({
@@ -172,7 +215,7 @@ export async function addToCart(
         }
       }
     })
-    return newItem as CartItem
+    return serializeCartItemRaw(newItem)
   }
 }
 
@@ -213,7 +256,7 @@ export async function updateCartItem(
     }
   })
 
-  return updatedItem as CartItem
+  return serializeCartItemRaw(updatedItem)
 }
 
 export async function removeFromCart(
@@ -252,7 +295,7 @@ export async function applyCoupon(
     return { success: false, discount: 0, error: 'Invalid coupon code' }
   }
 
-  if (!coupon.active) {
+  if (!coupon.isActive) {
     return { success: false, discount: 0, error: 'Coupon is not active' }
   }
 
@@ -260,25 +303,25 @@ export async function applyCoupon(
     return { success: false, discount: 0, error: 'Coupon has expired' }
   }
 
-  if (coupon.maxUses && coupon.usedCount >= coupon.maxUses) {
+  if (coupon.usageLimit && coupon.usedCount >= coupon.usageLimit) {
     return { success: false, discount: 0, error: 'Coupon usage limit reached' }
   }
 
   const cartSummary = await getCart(userId)
 
-  if (coupon.minOrderAmount && cartSummary.subtotal < coupon.minOrderAmount) {
+  if (coupon.minimumAmount && cartSummary.subtotal < Number(coupon.minimumAmount)) {
     return {
       success: false,
       discount: 0,
-      error: `Minimum order amount is ${coupon.minOrderAmount}`
+      error: `Minimum order amount is ${Number(coupon.minimumAmount)}`
     }
   }
 
   let discount = 0
   if (coupon.type === 'PERCENTAGE') {
-    discount = (cartSummary.subtotal * coupon.value) / 100
+    discount = (cartSummary.subtotal * Number(coupon.value)) / 100
   } else {
-    discount = coupon.value
+    discount = Number(coupon.value)
   }
 
   // Don't let discount exceed subtotal

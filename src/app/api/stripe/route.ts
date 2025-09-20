@@ -3,7 +3,9 @@ import { getPaymentAdapter, PaymentProvider } from '@/lib/payments'
 
 export async function POST(request: NextRequest) {
   try {
-    const { amount, currency = 'usd', orderId, metadata } = await request.json()
+    const { amount, currency, orderId, metadata } = await request.json()
+    const defaultCurrency = (process.env.DEFAULT_CURRENCY || 'MRU').toLowerCase()
+    const resolvedCurrency = (currency || defaultCurrency).toLowerCase()
 
     if (!amount || amount <= 0) {
       return NextResponse.json(
@@ -15,7 +17,7 @@ export async function POST(request: NextRequest) {
     const stripeAdapter = getPaymentAdapter(PaymentProvider.STRIPE)
     const paymentIntent = await stripeAdapter.createPayment(
       amount,
-      currency,
+      resolvedCurrency,
       { orderId, ...metadata }
     )
 

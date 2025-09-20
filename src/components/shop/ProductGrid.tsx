@@ -1,11 +1,20 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { useTranslations, useLocale } from 'next-intl'
-import { Product, Category } from '@prisma/client'
+// Do not import Prisma Product type directly to avoid Decimal typing issues in the UI layer
 import { formatPrice } from '@/lib/utils'
 import { Heart, ShoppingCart } from 'lucide-react'
 import Pagination from '@/components/ui/Pagination'
 
-interface ProductWithCategory extends Product {
+interface ProductWithCategory {
+  id: string
+  name: string
+  slug: string
+  description?: string | null | undefined
+  price: number | string | { toNumber?: () => number } | null
+  comparePrice?: number | string | { toNumber?: () => number } | null | undefined
+  images?: string[]
+  inventory?: number | null | undefined
   category: {
     name: string
     slug: string
@@ -47,28 +56,31 @@ export default function ProductGrid({
   return (
     <div>
       {/* Products Grid */}
-      <div className="grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-3 xl:gap-x-8">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
         {products.map((product) => (
           <div key={product.id} className="group relative bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
             <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-t-lg bg-gray-200">
-              <img
-                src={product.images[0] || `/img/products/placeholder.jpg`}
+              <Image
+                src={product.images?.[0] || `/images/placeholder-product.jpg`}
                 alt={product.name}
-                className="h-64 w-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                width={800}
+                height={800}
+                className="h-56 sm:h-64 w-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                unoptimized
               />
               <div className="absolute top-2 right-2 rtl:right-auto rtl:left-2 opacity-0 group-hover:opacity-100 transition-opacity">
                 <button className="p-2 bg-white rounded-full shadow-md hover:bg-gray-50">
                   <Heart className="h-4 w-4 text-gray-600" />
                 </button>
               </div>
-              {product.compareAtPrice && product.compareAtPrice > product.price && (
+              {product.comparePrice !== undefined && Number(product.comparePrice) > Number(product.price || 0) && (
                 <div className="absolute top-2 left-2 rtl:left-auto rtl:right-2">
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                    {Math.round(((product.compareAtPrice - product.price) / product.compareAtPrice) * 100)}% {t('common.off')}
+                      {Math.round(((Number(product.comparePrice) - Number(product.price || 0)) / Number(product.comparePrice)) * 100)}% {t('common.off')}
                   </span>
                 </div>
               )}
-              {product.inventory <= 0 && (
+              {Number(product.inventory || 0) <= 0 && (
                 <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
                   <span className="text-white font-medium">{t('products.outOfStock')}</span>
                 </div>
@@ -98,16 +110,16 @@ export default function ProductGrid({
               <div className="mt-2 flex items-center justify-between">
                 <div className="flex items-center space-x-2 rtl:space-x-reverse">
                   <span className="text-lg font-bold text-gray-900">
-                    {formatPrice(product.price, 'USD', locale)}
+                    {formatPrice(Number(product.price), undefined, locale)}
                   </span>
-                  {product.compareAtPrice && product.compareAtPrice > product.price && (
+                  {product.comparePrice !== undefined && Number(product.comparePrice) > Number(product.price || 0) && (
                     <span className="text-sm text-gray-500 line-through">
-                      {formatPrice(product.compareAtPrice, 'USD', locale)}
+                      {formatPrice(Number(product.comparePrice), undefined, locale)}
                     </span>
                   )}
                 </div>
                 <div className="text-sm text-gray-500">
-                  {product.inventory > 0 ? (
+                  {Number(product.inventory || 0) > 0 ? (
                     `${product.inventory} ${t('products.inStock')}`
                   ) : (
                     t('products.outOfStock')
@@ -116,11 +128,11 @@ export default function ProductGrid({
               </div>
 
               <button 
-                disabled={product.inventory <= 0}
+                disabled={Number(product.inventory || 0) <= 0}
                 className="mt-4 w-full flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-amber-600 hover:bg-amber-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
               >
                 <ShoppingCart className="h-4 w-4 mr-2 rtl:mr-0 rtl:ml-2" />
-                {product.inventory > 0 ? t('products.addToCart') : t('products.outOfStock')}
+                {Number(product.inventory || 0) > 0 ? t('products.addToCart') : t('products.outOfStock')}
               </button>
             </div>
           </div>

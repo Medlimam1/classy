@@ -1,5 +1,4 @@
-import { Suspense } from 'react'
-import { useTranslations } from 'next-intl'
+import getRequestConfig from '../../../i18n/request'
 import { CheckCircle, Package, Truck, Mail } from 'lucide-react'
 import Link from 'next/link'
 
@@ -13,8 +12,11 @@ interface CheckoutSuccessPageProps {
   }
 }
 
-export default function CheckoutSuccessPage({ params, searchParams }: CheckoutSuccessPageProps) {
-  const t = useTranslations()
+export default async function CheckoutSuccessPage({ params, searchParams }: CheckoutSuccessPageProps) {
+  const { locale } = await params
+  const cfg = await getRequestConfig({ requestLocale: Promise.resolve(locale) as any }).catch(() => null)
+  const messages = cfg?.messages as Record<string, string> | null
+  const t = (key: string) => messages?.[key] ?? key
 
   return (
     <div className="bg-white">
@@ -94,7 +96,7 @@ export default function CheckoutSuccessPage({ params, searchParams }: CheckoutSu
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             {searchParams.order_id && (
               <Link
-                href={`/${params.locale}/orders/${searchParams.order_id}`}
+                href={`/${locale}/orders/${searchParams.order_id}`}
                 className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-amber-600 hover:bg-amber-700 transition-colors"
               >
                 {t('checkout.success.viewOrder')}
@@ -102,7 +104,7 @@ export default function CheckoutSuccessPage({ params, searchParams }: CheckoutSu
             )}
             
             <Link
-              href={`/${params.locale}/shop`}
+              href={`/${locale}/shop`}
               className="inline-flex items-center justify-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-colors"
             >
               {t('checkout.success.continueShopping')}
@@ -119,13 +121,13 @@ export default function CheckoutSuccessPage({ params, searchParams }: CheckoutSu
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Link
-              href={`/${params.locale}/contact`}
+              href={`/${locale}/contact`}
               className="inline-flex items-center justify-center px-4 py-2 border border-amber-300 text-sm font-medium rounded-md text-amber-700 bg-white hover:bg-amber-50 transition-colors"
             >
               {t('checkout.success.needHelp.contact')}
             </Link>
             <Link
-              href={`/${params.locale}/help`}
+              href={`/${locale}/help`}
               className="inline-flex items-center justify-center px-4 py-2 border border-amber-300 text-sm font-medium rounded-md text-amber-700 bg-white hover:bg-amber-50 transition-colors"
             >
               {t('checkout.success.needHelp.help')}

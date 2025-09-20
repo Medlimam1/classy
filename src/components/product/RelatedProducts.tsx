@@ -75,12 +75,12 @@ export default function RelatedProducts({ products }: RelatedProductsProps) {
 
               <div className="mt-2 flex items-center justify-between">
                 <div className="flex items-center space-x-2 rtl:space-x-reverse">
-                  <span className="text-sm font-bold text-gray-900">
-                    {formatPrice(product.price, 'USD', locale)}
+                    <span className="text-sm font-bold text-gray-900">
+                    {formatPrice(product.price, undefined, locale)}
                   </span>
                   {product.compareAtPrice && product.compareAtPrice > product.price && (
-                    <span className="text-xs text-gray-500 line-through">
-                      {formatPrice(product.compareAtPrice, 'USD', locale)}
+                      <span className="text-xs text-gray-500 line-through">
+                      {formatPrice(product.compareAtPrice, undefined, locale)}
                     </span>
                   )}
                 </div>

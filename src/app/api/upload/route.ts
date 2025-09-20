@@ -1,92 +1,58 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { v2 as cloudinary } from 'cloudinary'
+import fs from 'fs/promises'
+import path from 'path'
 
-// Configure Cloudinary
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-})
-
-export async function POST(request: NextRequest) {
-  try {
-    const formData = await request.formData()
-    const file = formData.get('file') as File
-
-    if (!file) {
-      return NextResponse.json(
-        { error: 'No file provided' },
-        { status: 400 }
-      )
-    }
-
-    // Convert file to buffer
-    const bytes = await file.arrayBuffer()
-    const buffer = Buffer.from(bytes)
-
-    // Upload to Cloudinary
-    const result = await new Promise((resolve, reject) => {
-      cloudinary.uploader.upload_stream(
-        {
-          resource_type: 'auto',
-          folder: 'classy-store',
-          transformation: [
-            { width: 800, height: 800, crop: 'limit' },
-            { quality: 'auto' },
-            { format: 'auto' }
-          ]
-        },
-        (error, result) => {
-          if (error) reject(error)
-          else resolve(result)
-        }
-      ).end(buffer)
-    })
-
-    const uploadResult = result as any
-
-    return NextResponse.json({
-      success: true,
-      url: uploadResult.secure_url,
-      publicId: uploadResult.public_id,
-    })
-  } catch (error) {
-    console.error('Upload failed:', error)
-    return NextResponse.json(
-      { error: 'Upload failed' },
-      { status: 500 }
-    )
-  }
+type FilePayload = {
+  name: string
+  data: string // data URL or base64
 }
 
-// Generate signature for client-side uploads
-export async function GET(request: NextRequest) {
+export async function POST(req: Request) {
   try {
-    const { searchParams } = new URL(request.url)
-    const timestamp = Math.round(new Date().getTime() / 1000)
-    const folder = searchParams.get('folder') || 'classy-store'
+    const body = await req.json()
+    if (!body || !Array.isArray(body.files)) {
+      return new Response(JSON.stringify({ message: 'Invalid payload' }), { status: 400 })
+    }
 
-    const signature = cloudinary.utils.api_sign_request(
-      {
-        timestamp,
-        folder,
-        transformation: 'w_800,h_800,c_limit,q_auto,f_auto'
-      },
-      process.env.CLOUDINARY_API_SECRET!
-    )
+    const uploadDir = path.join(process.cwd(), 'public', 'uploads')
+    await fs.mkdir(uploadDir, { recursive: true })
 
-    return NextResponse.json({
-      signature,
-      timestamp,
-      cloudName: process.env.CLOUDINARY_CLOUD_NAME,
-      apiKey: process.env.CLOUDINARY_API_KEY,
-      folder,
-    })
-  } catch (error) {
-    console.error('Signature generation failed:', error)
-    return NextResponse.json(
-      { error: 'Failed to generate signature' },
-      { status: 500 }
-    )
+    const urls: string[] = []
+
+    for (const f of body.files as FilePayload[]) {
+      const name = f.name || `file-${Date.now()}`
+      const data: string = f.data
+
+      // support data URL: data:<mime>;base64,<data>
+      const match = String(data).match(/^data:(.+);base64,(.+)$/)
+      let buffer: Buffer
+      let ext = path.extname(name)
+
+      if (match) {
+        const mime = match[1]
+        const b64 = match[2]
+        buffer = Buffer.from(b64, 'base64')
+        if (!ext) {
+          // basic mime -> ext mapping
+          if (mime === 'image/jpeg') ext = '.jpg'
+          else if (mime === 'image/png') ext = '.png'
+          else if (mime === 'image/gif') ext = '.gif'
+          else if (mime === 'image/webp') ext = '.webp'
+          else ext = ''
+        }
+      } else {
+        // assume plain base64
+        buffer = Buffer.from(data, 'base64')
+      }
+
+      const filename = `${Date.now()}-${Math.random().toString(36).slice(2,8)}${ext}`
+      const filepath = path.join(uploadDir, filename)
+      await fs.writeFile(filepath, buffer)
+      urls.push(`/uploads/${filename}`)
+    }
+
+    return new Response(JSON.stringify({ urls }), { status: 200 })
+  } catch (e) {
+    console.error('Upload error', e)
+    return new Response(JSON.stringify({ message: 'Upload failed' }), { status: 500 })
   }
 }

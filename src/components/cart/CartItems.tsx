@@ -1,6 +1,7 @@
-'use client'
+"use client"
 
 import { useState } from 'react'
+import Image from 'next/image'
 import { useTranslations, useLocale } from 'next-intl'
 import { formatPrice } from '@/lib/utils'
 import { Minus, Plus, Trash2 } from 'lucide-react'
@@ -57,7 +58,8 @@ export default function CartItems({ items }: CartItemsProps) {
 
       // Refresh the page to show updated cart
       window.location.reload()
-    } catch (error) {
+    } catch (error: unknown) {
+      console.error('Cart update error:', error)
       toast.error(t('cart.updateError'))
     } finally {
       setUpdatingItems(prev => {
@@ -87,7 +89,8 @@ export default function CartItems({ items }: CartItemsProps) {
       toast.success(t('cart.itemRemoved'))
       // Refresh the page to show updated cart
       window.location.reload()
-    } catch (error) {
+    } catch (error: unknown) {
+      console.error('Cart remove error:', error)
       toast.error(t('cart.removeError'))
     } finally {
       setUpdatingItems(prev => {
@@ -109,10 +112,12 @@ export default function CartItems({ items }: CartItemsProps) {
           <div key={item.id} className="flex items-center space-x-4 rtl:space-x-reverse bg-white p-6 rounded-lg shadow-sm border">
             {/* Product Image */}
             <div className="flex-shrink-0">
-              <img
-                src={item.product.images[0] || '/img/products/placeholder.jpg'}
+              <Image
+                src={item.product.images[0] || '/images/placeholder-product.jpg'}
                 alt={item.product.name}
-                className="w-20 h-20 object-cover rounded-md"
+                width={80}
+                height={80}
+                className="object-cover rounded-md"
               />
             </div>
 
@@ -127,7 +132,7 @@ export default function CartItems({ items }: CartItemsProps) {
                 </p>
               )}
               <p className="text-lg font-semibold text-gray-900 mt-1">
-                {formatPrice(itemPrice, 'USD', locale)}
+                {formatPrice(itemPrice, undefined, locale)}
               </p>
             </div>
 
@@ -155,7 +160,7 @@ export default function CartItems({ items }: CartItemsProps) {
             {/* Item Total */}
             <div className="text-right">
               <p className="text-lg font-semibold text-gray-900">
-                {formatPrice(itemTotal, 'USD', locale)}
+                {formatPrice(itemTotal, undefined, locale)}
               </p>
             </div>
 

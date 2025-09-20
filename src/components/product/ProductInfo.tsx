@@ -42,6 +42,10 @@ export default function ProductInfo({ product }: ProductInfoProps) {
       toast.error(t('auth.loginRequired'))
       return
     }
+    if (product.inventory <= 0) {
+      toast.error(t('cart.outOfStock'))
+      return
+    }
 
     setIsAddingToCart(true)
     
@@ -51,6 +55,8 @@ export default function ProductInfo({ product }: ProductInfoProps) {
         headers: {
           'Content-Type': 'application/json',
         },
+        // Ensure cookies are sent so session is available on the server
+        credentials: 'include',
         body: JSON.stringify({
           productId: product.id,
           variantId: selectedVariant,
@@ -58,8 +64,19 @@ export default function ProductInfo({ product }: ProductInfoProps) {
         }),
       })
 
+      console.log('[ProductInfo] Add to cart response status:', response.status)
+      const data = await response.json().catch(() => null)
+      console.log('[ProductInfo] Add to cart response body:', data)
+
       if (!response.ok) {
-        throw new Error('Failed to add to cart')
+        throw new Error(data?.error || 'Failed to add to cart')
+      }
+
+      // Notify other UI (header) to refresh cart count
+      try {
+        window.dispatchEvent(new Event('cart:updated'))
+      } catch (e) {
+        console.warn('Could not dispatch cart:updated event', e)
       }
 
       toast.success(t('cart.itemAdded'))
@@ -153,17 +170,17 @@ export default function ProductInfo({ product }: ProductInfoProps) {
       <div className="mt-4">
         <div className="flex items-center space-x-3 rtl:space-x-reverse">
           <p className="text-3xl font-bold text-gray-900">
-            {formatPrice(currentPrice, 'USD', locale)}
+            {formatPrice(currentPrice, undefined, locale)}
           </p>
           {product.compareAtPrice && product.compareAtPrice > currentPrice && (
             <p className="text-xl text-gray-500 line-through">
-              {formatPrice(product.compareAtPrice, 'USD', locale)}
+              {formatPrice(product.compareAtPrice, undefined, locale)}
             </p>
           )}
         </div>
         {product.compareAtPrice && product.compareAtPrice > currentPrice && (
           <p className="mt-1 text-sm text-green-600">
-            {t('products.save')} {formatPrice(product.compareAtPrice - currentPrice, 'USD', locale)} 
+            {t('products.save')} {formatPrice(product.compareAtPrice - currentPrice, undefined, locale)} 
             ({Math.round(((product.compareAtPrice - currentPrice) / product.compareAtPrice) * 100)}%)
           </p>
         )}
@@ -204,7 +221,7 @@ export default function ProductInfo({ product }: ProductInfoProps) {
                     {variant.value}
                     {variant.price && variant.price !== product.price && (
                       <span className="ml-2 rtl:ml-0 rtl:mr-2 text-xs">
-                        +{formatPrice(variant.price - product.price, 'USD', locale)}
+                        +{formatPrice(variant.price - product.price, undefined, locale)}
                       </span>
                     )}
                   </button>

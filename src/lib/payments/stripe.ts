@@ -1,20 +1,20 @@
 import Stripe from 'stripe'
 import { PaymentAdapter, PaymentIntent, PaymentStatus } from './types'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-12-18.acacia'
-})
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
 export class StripeAdapter implements PaymentAdapter {
   async createPayment(
     amount: number,
-    currency: string = 'usd',
+    currency?: string,
     metadata?: Record<string, any>
   ): Promise<PaymentIntent> {
     try {
+      const currencyCode = (currency || process.env.DEFAULT_CURRENCY || 'MRU').toLowerCase()
+
       const paymentIntent = await stripe.paymentIntents.create({
         amount: Math.round(amount * 100), // Convert to cents
-        currency: currency.toLowerCase(),
+        currency: currencyCode,
         metadata: metadata || {},
         automatic_payment_methods: {
           enabled: true,

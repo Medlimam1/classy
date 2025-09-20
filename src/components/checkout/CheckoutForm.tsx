@@ -26,20 +26,29 @@ export default function CheckoutForm({ locale }: CheckoutFormProps) {
   const [isProcessing, setIsProcessing] = useState(false)
 
   const t = useTranslations()
+  // safe translation wrapper: next-intl throws when a key is missing in dev; fallback to the key
+  const tSafe = (key: string) => {
+    try {
+      return t(key)
+    } catch {
+      // swallow and return the key as a fallback to avoid crashing the client
+      return key
+    }
+  }
   const router = useRouter()
 
   const steps = [
-    { id: 1, name: t('checkout.shippingAddress') },
-    { id: 2, name: t('checkout.paymentMethod') },
-    { id: 3, name: t('checkout.review') },
+  { id: 1, name: tSafe('checkout.shippingAddress') },
+  { id: 2, name: tSafe('checkout.paymentMethod') },
+  { id: 3, name: tSafe('checkout.review') },
   ]
 
-  const handleAddressSubmit = (addressData: any) => {
-    setFormData(prev => ({ ...prev, ...addressData }))
+  const handleAddressSubmit = (addressData: unknown) => {
+    setFormData(prev => ({ ...prev, ...(addressData as object) }))
     setCurrentStep(2)
   }
 
-  const handlePaymentMethodSelect = async (paymentMethod: string) => {
+  const handlePaymentMethodSelect = async (paymentMethod: 'STRIPE' | 'BANKILY' | 'MASRIFI' | 'SADAD' | 'COD') => {
     setFormData(prev => ({ ...prev, paymentMethod }))
     
     if (paymentMethod === 'STRIPE') {
@@ -59,8 +68,9 @@ export default function CheckoutForm({ locale }: CheckoutFormProps) {
         }
 
         setClientSecret(data.clientSecret)
-      } catch (error: any) {
-        toast.error(error.message || t('common.error'))
+      } catch (error: unknown) {
+        const msg = (error as { message?: string } )?.message
+        toast.error(msg || tSafe('common.error'))
         return
       }
     }
@@ -89,10 +99,11 @@ export default function CheckoutForm({ locale }: CheckoutFormProps) {
         throw new Error(data.error)
       }
 
-      toast.success(t('checkout.orderPlaced'))
+  toast.success(tSafe('checkout.orderPlaced'))
       router.push(`/${locale}/orders/${data.order.id}`)
-    } catch (error: any) {
-      toast.error(error.message || t('checkout.paymentFailed'))
+    } catch (error: unknown) {
+      const msg = (error as { message?: string } )?.message
+      toast.error(msg || tSafe('checkout.paymentFailed'))
     } finally {
       setIsProcessing(false)
     }
@@ -145,7 +156,7 @@ export default function CheckoutForm({ locale }: CheckoutFormProps) {
         {currentStep === 2 && (
           <div>
             <h2 className="text-lg font-medium text-gray-900 mb-4">
-              {t('checkout.paymentMethod')}
+              {tSafe('checkout.paymentMethod')}
             </h2>
             <div className="space-y-4">
               {['STRIPE', 'BANKILY', 'MASRIFI', 'SADAD', 'COD'].map((method) => (
@@ -155,11 +166,11 @@ export default function CheckoutForm({ locale }: CheckoutFormProps) {
                     name="paymentMethod"
                     value={method}
                     checked={formData.paymentMethod === method}
-                    onChange={() => handlePaymentMethodSelect(method)}
+                    onChange={() => handlePaymentMethodSelect(method as 'STRIPE' | 'BANKILY' | 'MASRIFI' | 'SADAD' | 'COD')}
                     className="h-4 w-4 text-amber-600 focus:ring-amber-500 border-gray-300"
                   />
                   <span className="ml-3 rtl:ml-0 rtl:mr-3 text-sm font-medium text-gray-700">
-                    {method === 'COD' ? t('checkout.cashOnDelivery') : method}
+                    {method === 'COD' ? tSafe('checkout.cashOnDelivery') : method}
                   </span>
                 </label>
               ))}
@@ -170,14 +181,14 @@ export default function CheckoutForm({ locale }: CheckoutFormProps) {
         {currentStep === 3 && (
           <div>
             <h2 className="text-lg font-medium text-gray-900 mb-4">
-              {t('checkout.review')}
+              {tSafe('checkout.review')}
             </h2>
             
             {formData.paymentMethod === 'STRIPE' && clientSecret ? (
               <Elements stripe={stripePromise} options={{ clientSecret }}>
                 <PaymentForm
                   clientSecret={clientSecret}
-                  onSuccess={() => router.push(`/${locale}/orders`)}
+                  redirectPath={`/${locale}/orders`}
                 />
               </Elements>
             ) : (
@@ -189,7 +200,7 @@ export default function CheckoutForm({ locale }: CheckoutFormProps) {
                 {isProcessing ? (
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
                 ) : (
-                  t('checkout.placeOrder')
+                  tSafe('checkout.placeOrder')
                 )}
               </button>
             )}

@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { getServerSession } from 'next-auth'
-import { useTranslations } from 'next-intl'
+// server-side pages load messages directly; do not use client hooks here
 import { authOptions } from '@/lib/auth'
 import { getCart } from '@/lib/cart'
 import CheckoutForm from '@/components/checkout/CheckoutForm'
@@ -13,17 +13,24 @@ interface CheckoutPageProps {
 }
 
 export default async function CheckoutPage({ params }: CheckoutPageProps) {
+  const { locale } = await params
   const session = await getServerSession(authOptions)
-  const t = useTranslations()
+
+  // Load messages for server-side rendering (avoid client hooks in server components)
+  const base = locale.split('-')[0].toLowerCase()
+  const messages = (await import(`@/messages/${base}.json`)).default
+  const t = (key: string) => {
+    return messages?.[key] ?? key
+  }
 
   if (!session?.user?.id) {
-    redirect(`/${params.locale}/auth/login?callbackUrl=/${params.locale}/checkout`)
+    redirect(`/${locale}/auth/login?callbackUrl=/${locale}/checkout`)
   }
 
   const cartSummary = await getCart(session.user.id)
 
   if (cartSummary.items.length === 0) {
-    redirect(`/${params.locale}/cart`)
+    redirect(`/${locale}/cart`)
   }
 
   return (
@@ -35,14 +42,14 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
       <div className="lg:grid lg:grid-cols-12 lg:gap-x-12 lg:items-start">
         {/* Checkout Form */}
         <div className="lg:col-span-7">
-          <CheckoutForm locale={params.locale} />
+          <CheckoutForm locale={locale} />
         </div>
 
         {/* Order Summary */}
         <div className="mt-10 lg:mt-0 lg:col-span-5">
           <CheckoutSummary 
             summary={cartSummary}
-            locale={params.locale}
+            locale={locale}
           />
         </div>
       </div>

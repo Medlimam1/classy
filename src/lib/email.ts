@@ -1,7 +1,7 @@
 import nodemailer from 'nodemailer'
 
 // Create transporter
-const transporter = nodemailer.createTransporter({
+const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST || 'smtp.gmail.com',
   port: parseInt(process.env.SMTP_PORT || '587'),
   secure: false,
@@ -33,8 +33,8 @@ export async function sendContactEmail(data: ContactEmailData) {
   const { name, email, subject, message } = data
 
   const mailOptions = {
-    from: process.env.SMTP_FROM || 'noreply@classystore.mr',
-    to: process.env.CONTACT_EMAIL || 'info@classystore.mr',
+    from: process.env.SMTP_FROM || 'medlimame9@gmail.com',
+    to: process.env.CONTACT_EMAIL || 'medlimame9@gmail.com',
     subject: `Contact Form: ${subject}`,
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -60,7 +60,17 @@ export async function sendContactEmail(data: ContactEmailData) {
     `,
   }
 
-  await transporter.sendMail(mailOptions)
+  if (process.env.DISABLE_EMAIL === 'true') {
+    console.log('[email] DISABLE_EMAIL=true set, skipping sendContactEmail')
+    return
+  }
+
+  try {
+    await transporter.sendMail(mailOptions)
+  } catch (err) {
+    console.error('[email] sendContactEmail failed:', err)
+    // Don't throw; email failures shouldn't break order creation in dev environments
+  }
 }
 
 export async function sendOrderConfirmation(email: string, order: OrderEmailData) {
@@ -75,7 +85,7 @@ export async function sendOrderConfirmation(email: string, order: OrderEmailData
   `).join('')
 
   const mailOptions = {
-    from: process.env.SMTP_FROM || 'noreply@classystore.mr',
+    from: process.env.SMTP_FROM || 'medlimame9@gmail.com',
     to: email,
     subject: `Order Confirmation - #${id.slice(-8).toUpperCase()}`,
     html: `
@@ -131,14 +141,23 @@ export async function sendOrderConfirmation(email: string, order: OrderEmailData
     `,
   }
 
-  await transporter.sendMail(mailOptions)
+  if (process.env.DISABLE_EMAIL === 'true') {
+    console.log('[email] DISABLE_EMAIL=true set, skipping sendOrderConfirmation')
+    return
+  }
+
+  try {
+    await transporter.sendMail(mailOptions)
+  } catch (err) {
+    console.error('[email] sendOrderConfirmation failed:', err)
+  }
 }
 
 export async function sendPasswordResetEmail(email: string, resetToken: string) {
   const resetUrl = `${process.env.NEXTAUTH_URL}/auth/reset-password?token=${resetToken}`
 
   const mailOptions = {
-    from: process.env.SMTP_FROM || 'noreply@classystore.mr',
+    from: process.env.SMTP_FROM || 'medlimame9@gmail.com',
     to: email,
     subject: 'Password Reset Request - Classy Store',
     html: `
@@ -178,5 +197,14 @@ export async function sendPasswordResetEmail(email: string, resetToken: string) 
     `,
   }
 
-  await transporter.sendMail(mailOptions)
+  if (process.env.DISABLE_EMAIL === 'true') {
+    console.log('[email] DISABLE_EMAIL=true set, skipping sendPasswordResetEmail')
+    return
+  }
+
+  try {
+    await transporter.sendMail(mailOptions)
+  } catch (err) {
+    console.error('[email] sendPasswordResetEmail failed:', err)
+  }
 }

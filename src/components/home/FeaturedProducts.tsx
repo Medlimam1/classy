@@ -72,11 +72,11 @@ export default function FeaturedProducts({ products }: FeaturedProductsProps) {
                 <div className="mt-2 flex items-center justify-between">
                   <div className="flex items-center space-x-2 rtl:space-x-reverse">
                     <span className="text-lg font-bold text-gray-900">
-                      {formatPrice(product.price, 'USD', locale)}
+                      {formatPrice(product.price, undefined, locale)}
                     </span>
                     {product.compareAtPrice && product.compareAtPrice > product.price && (
                       <span className="text-sm text-gray-500 line-through">
-                        {formatPrice(product.compareAtPrice, 'USD', locale)}
+                        {formatPrice(product.compareAtPrice, undefined, locale)}
                       </span>
                     )}
                   </div>

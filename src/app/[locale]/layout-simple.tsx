@@ -8,9 +8,10 @@ export default async function SimpleLayout({
   params: Promise<{ locale: string }>
 }) {
   const { locale } = await params
+  const resolvedLocale = locale || 'en'
 
   return (
-    <html lang={locale} dir={locale === 'ar' ? 'rtl' : 'ltr'}>
+    <html lang={resolvedLocale} dir={resolvedLocale === 'ar' ? 'rtl' : 'ltr'}>
       <body>
         <div className="min-h-screen">
           {children}

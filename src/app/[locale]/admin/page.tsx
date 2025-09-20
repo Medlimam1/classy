@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { formatPrice, formatDate } from '@/lib/utils'
 
 export default async function AdminDashboard() {
   const session = await getServerSession(authOptions)
@@ -144,7 +145,7 @@ export default async function AdminDashboard() {
                     {order.user?.name || 'ضيف'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {order.total.toFixed(2)} أوقية
+                    {formatPrice(Number(order.total), undefined, 'ar')}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
@@ -160,7 +161,7 @@ export default async function AdminDashboard() {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {new Date(order.createdAt).toLocaleDateString('ar-SA')}
+                    {formatDate(order.createdAt, 'ar')}
                   </td>
                 </tr>
               ))}

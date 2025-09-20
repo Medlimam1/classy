@@ -1,6 +1,6 @@
 import { notFound, redirect } from 'next/navigation'
 import { getServerSession } from 'next-auth'
-import { useTranslations } from 'next-intl'
+// server-side pages load messages directly; do not use client hooks here
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import OrderDetails from '@/components/orders/OrderDetails'
@@ -13,16 +13,21 @@ interface OrderPageProps {
 }
 
 export default async function OrderPage({ params }: OrderPageProps) {
+  const { locale, id } = await params
   const session = await getServerSession(authOptions)
-  const t = useTranslations()
+
+  // Load messages server-side
+  const base = locale.split('-')[0].toLowerCase()
+  const messages = (await import(`../../../messages/${base}.json`)).default
+  const t = (key: string) => messages?.[key] ?? key
 
   if (!session?.user?.id) {
-    redirect(`/${params.locale}/auth/login?callbackUrl=/${params.locale}/orders/${params.id}`)
+    redirect(`/${locale}/auth/login?callbackUrl=/${locale}/orders/${params.id}`)
   }
 
   const order = await prisma.order.findFirst({
     where: {
-      id: params.id,
+      id: id,
       userId: session.user.id,
     },
     include: {
@@ -33,12 +38,6 @@ export default async function OrderPage({ params }: OrderPageProps) {
               name: true,
               slug: true,
               images: true,
-            }
-          },
-          variant: {
-            select: {
-              name: true,
-              value: true,
             }
           }
         }
@@ -66,7 +65,7 @@ export default async function OrderPage({ params }: OrderPageProps) {
       <nav className="flex mb-8" aria-label="Breadcrumb">
         <ol className="inline-flex items-center space-x-1 rtl:space-x-reverse md:space-x-3">
           <li className="inline-flex items-center">
-            <a href={`/${params.locale}`} className="inline-flex items-center text-sm font-medium text-gray-700 hover:text-amber-600">
+            <a href={`/${locale}`} className="inline-flex items-center text-sm font-medium text-gray-700 hover:text-amber-600">
               {t('navigation.home')}
             </a>
           </li>
@@ -75,7 +74,7 @@ export default async function OrderPage({ params }: OrderPageProps) {
               <svg className="w-3 h-3 text-gray-400 mx-1 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
                 <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 9 4-4-4-4"/>
               </svg>
-              <a href={`/${params.locale}/orders`} className="ml-1 rtl:ml-0 rtl:mr-1 text-sm font-medium text-gray-700 hover:text-amber-600 md:ml-2 rtl:md:ml-0 rtl:md:mr-2">
+              <a href={`/${locale}/orders`} className="ml-1 rtl:ml-0 rtl:mr-1 text-sm font-medium text-gray-700 hover:text-amber-600 md:ml-2 rtl:md:ml-0 rtl:md:mr-2">
                 {t('orders.title')}
               </a>
             </div>
@@ -93,7 +92,7 @@ export default async function OrderPage({ params }: OrderPageProps) {
         </ol>
       </nav>
 
-      <OrderDetails order={order} locale={params.locale} />
+  <OrderDetails order={order} locale={locale} />
     </div>
   )
 }

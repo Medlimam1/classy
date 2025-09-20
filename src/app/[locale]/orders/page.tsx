@@ -1,9 +1,9 @@
 import { redirect } from 'next/navigation'
 import { getServerSession } from 'next-auth'
-import { useTranslations } from 'next-intl'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import OrdersList from '@/components/orders/OrdersList'
+import getRequestConfig from '../../i18n/request'
 
 interface OrdersPageProps {
   params: {
@@ -12,11 +12,14 @@ interface OrdersPageProps {
 }
 
 export default async function OrdersPage({ params }: OrdersPageProps) {
+  const { locale } = await params
   const session = await getServerSession(authOptions)
-  const t = useTranslations()
+  const cfg = await getRequestConfig({ requestLocale: Promise.resolve(locale) as any }).catch(() => null)
+  const messages = cfg?.messages as Record<string, string> | null
+  const t = (key: string) => messages?.[key] ?? key
 
   if (!session?.user?.id) {
-    redirect(`/${params.locale}/auth/login?callbackUrl=/${params.locale}/orders`)
+    redirect(`/${locale}/auth/login?callbackUrl=/${locale}/orders`)
   }
 
   const orders = await prisma.order.findMany({
@@ -72,14 +75,14 @@ export default async function OrdersPage({ params }: OrdersPageProps) {
             {t('orders.noOrders')}
           </div>
           <a
-            href={`/${params.locale}/shop`}
+            href={`/${locale}/shop`}
             className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-amber-600 hover:bg-amber-700 transition-colors"
           >
             {t('orders.startShopping')}
           </a>
         </div>
       ) : (
-        <OrdersList orders={orders} locale={params.locale} />
+        <OrdersList orders={orders} locale={locale} />
       )}
     </div>
   )

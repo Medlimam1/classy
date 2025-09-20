@@ -11,7 +11,7 @@ interface ProductGalleryProps {
 export default function ProductGallery({ images, productName }: ProductGalleryProps) {
   const [selectedImage, setSelectedImage] = useState(0)
   
-  const productImages = images.length > 0 ? images : ['/img/products/placeholder.jpg']
+  const productImages = images && images.length > 0 ? images : ['/images/placeholder-product.jpg']
 
   const nextImage = () => {
     setSelectedImage((prev) => (prev + 1) % productImages.length)

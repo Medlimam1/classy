@@ -32,6 +32,7 @@
   "navigation": {
     "shop": "Shop",
     "categories": "Categories",
+    "openMenu": "Open menu",
     "cart": "Cart",
     "account": "My Account",
     "orders": "My Orders",
@@ -64,7 +65,7 @@
   "products": {
     "featured": "Featured Products",
     "featuredSubtitle": "Handpicked items from our latest collection",
-    "addToCart": "Add to Cart",
+  "addToCart": "Add to Cart",
     "viewAll": "View All Products",
     "outOfStock": "Out of Stock",
     "inStock": "In Stock",
@@ -120,7 +121,10 @@
   },
   "cart": {
     "title": "Shopping Cart",
+    "orderSummary": "Order Summary",
     "empty": "Your cart is empty",
+    "enterCoupon": "Enter coupon code",
+    "freeShipping": "Free Shipping",
     "continueShopping": "Continue Shopping",
     "checkout": "Checkout",
     "subtotal": "Subtotal",
@@ -133,11 +137,15 @@
     "applyCoupon": "Apply Coupon",
     "couponCode": "Coupon Code",
     "invalidCoupon": "Invalid coupon code",
-    "couponApplied": "Coupon applied successfully"
+    "couponApplied": "Coupon applied successfully",
+    "discount": "Discount"
   },
+  
   "checkout": {
     "title": "Checkout",
     "shippingAddress": "Shipping Address",
+    "review": "Review Order",
+    "cashOnDelivery": "Cash on Delivery",
     "billingAddress": "Billing Address",
     "sameAsBilling": "Same as shipping address",
     "paymentMethod": "Payment Method",
@@ -170,7 +178,26 @@
     "shippingAddress": "Shipping Address",
     "billingAddress": "Billing Address",
     "paymentMethod": "Payment Method",
-    "orderItems": "Order Items"
+    "orderItems": "Order Items",
+    "placedOn": "Placed on",
+    "statusNew": "New",
+    "statusPending": "Pending",
+    "statusPaid": "Paid",
+    "statusFulfilled": "Fulfilled",
+    "statusCancelled": "Cancelled",
+    "orderPlaced": "Order placed",
+    "paymentConfirmed": "Payment confirmed",
+    "orderDelivered": "Order delivered",
+    "each": "each",
+    "orderSummary": "Order Summary",
+    "paymentInformation": "Payment Information",
+    "method": "Method",
+    "amount": "Amount",
+    "transactionId": "Transaction ID",
+    "shippingInformation": "Shipping Information",
+    "carrier": "Carrier",
+    "trackingNumber": "Tracking Number",
+    "shippedOn": "Shipped on"
   },
   "admin": {
     "dashboard": "Dashboard",

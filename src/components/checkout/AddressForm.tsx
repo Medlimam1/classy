@@ -14,7 +14,7 @@ export default function AddressForm({ onSubmit, initialData = {} }: AddressFormP
     firstName: initialData.firstName || '',
     lastName: initialData.lastName || '',
     company: initialData.company || '',
-    address: initialData.address || '',
+    address1: initialData.address || '',
     address2: initialData.address2 || '',
     city: initialData.city || '',
     state: initialData.state || '',
@@ -27,7 +27,7 @@ export default function AddressForm({ onSubmit, initialData = {} }: AddressFormP
     firstName: initialData.billingFirstName || '',
     lastName: initialData.billingLastName || '',
     company: initialData.billingCompany || '',
-    address: initialData.billingAddress || '',
+    address1: initialData.billingAddress || '',
     address2: initialData.billingAddress2 || '',
     city: initialData.billingCity || '',
     state: initialData.billingState || '',
@@ -38,14 +38,25 @@ export default function AddressForm({ onSubmit, initialData = {} }: AddressFormP
   const [errors, setErrors] = useState<any>({})
 
   const t = useTranslations()
+  // safe translation wrapper: next-intl throws when a key is missing in dev; fallback to the key
+  const tSafe = (key: string) => {
+    try {
+      return t(key)
+    } catch {
+      // swallow and return the key as a fallback to avoid crashing the client
+      return key
+    }
+  }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     setErrors({})
+    console.log('[AddressForm] submit triggered, formData:', formData)
 
     try {
       // Validate shipping address
       const validatedShipping = addressSchema.parse(formData)
+  console.log('[AddressForm] validation passed, shipping:', validatedShipping)
       
       let validatedBilling = validatedShipping
       if (!sameAsBilling) {
@@ -57,11 +68,15 @@ export default function AddressForm({ onSubmit, initialData = {} }: AddressFormP
         billingAddress: validatedBilling,
         sameAsBilling,
       })
-    } catch (error: any) {
-      if (error.errors) {
-        const fieldErrors: any = {}
-        error.errors.forEach((err: any) => {
-          fieldErrors[err.path[0]] = err.message
+      // small debug toast to confirm submit reached here
+      try { (window as any).__addressFormLastSubmitted = Date.now() } catch (e) {}
+    } catch (error) {
+      const e = error as any
+      if (e?.errors && Array.isArray(e.errors)) {
+        const fieldErrors: Record<string, string> = {}
+        e.errors.forEach((err: any) => {
+          const key = err?.path?.[0] ?? 'unknown'
+          fieldErrors[key] = String(err?.message ?? 'Invalid')
         })
         setErrors(fieldErrors)
       }
@@ -95,13 +110,13 @@ export default function AddressForm({ onSubmit, initialData = {} }: AddressFormP
     <form onSubmit={handleSubmit} className="space-y-6">
       <div>
         <h2 className="text-lg font-medium text-gray-900 mb-4">
-          {t('checkout.shippingAddress')}
+          {tSafe('checkout.shippingAddress')}
         </h2>
         
         <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
           <div>
             <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
-              {t('checkout.firstName')}
+              {tSafe('checkout.firstName')}
             </label>
             <input
               type="text"
@@ -118,7 +133,7 @@ export default function AddressForm({ onSubmit, initialData = {} }: AddressFormP
 
           <div>
             <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
-              {t('checkout.lastName')}
+              {tSafe('checkout.lastName')}
             </label>
             <input
               type="text"
@@ -135,7 +150,7 @@ export default function AddressForm({ onSubmit, initialData = {} }: AddressFormP
 
           <div className="sm:col-span-2">
             <label htmlFor="company" className="block text-sm font-medium text-gray-700">
-              {t('checkout.company')}
+              {tSafe('checkout.company')}
             </label>
             <input
               type="text"
@@ -148,25 +163,25 @@ export default function AddressForm({ onSubmit, initialData = {} }: AddressFormP
           </div>
 
           <div className="sm:col-span-2">
-            <label htmlFor="address" className="block text-sm font-medium text-gray-700">
-              {t('checkout.address')}
+            <label htmlFor="address1" className="block text-sm font-medium text-gray-700">
+              {tSafe('checkout.address')}
             </label>
             <input
               type="text"
-              id="address"
-              name="address"
-              value={formData.address}
+              id="address1"
+              name="address1"
+              value={formData.address1}
               onChange={handleChange}
-              className={`mt-1 block w-full border ${errors.address ? 'border-red-300' : 'border-gray-300'} rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-amber-500 focus:border-amber-500`}
+              className={`mt-1 block w-full border ${errors.address1 ? 'border-red-300' : 'border-gray-300'} rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-amber-500 focus:border-amber-500`}
             />
             {errors.address && (
-              <p className="mt-1 text-sm text-red-600">{errors.address}</p>
+              <p className="mt-1 text-sm text-red-600">{errors.address1 || errors.address}</p>
             )}
           </div>
 
           <div className="sm:col-span-2">
             <label htmlFor="address2" className="block text-sm font-medium text-gray-700">
-              {t('checkout.address2')}
+              {tSafe('checkout.address2')}
             </label>
             <input
               type="text"
@@ -180,7 +195,7 @@ export default function AddressForm({ onSubmit, initialData = {} }: AddressFormP
 
           <div>
             <label htmlFor="city" className="block text-sm font-medium text-gray-700">
-              {t('checkout.city')}
+              {tSafe('checkout.city')}
             </label>
             <input
               type="text"
@@ -197,7 +212,7 @@ export default function AddressForm({ onSubmit, initialData = {} }: AddressFormP
 
           <div>
             <label htmlFor="state" className="block text-sm font-medium text-gray-700">
-              {t('checkout.state')}
+              {tSafe('checkout.state')}
             </label>
             <input
               type="text"
@@ -211,7 +226,7 @@ export default function AddressForm({ onSubmit, initialData = {} }: AddressFormP
 
           <div>
             <label htmlFor="postalCode" className="block text-sm font-medium text-gray-700">
-              {t('checkout.postalCode')}
+              {tSafe('checkout.postalCode')}
             </label>
             <input
               type="text"
@@ -228,7 +243,7 @@ export default function AddressForm({ onSubmit, initialData = {} }: AddressFormP
 
           <div>
             <label htmlFor="country" className="block text-sm font-medium text-gray-700">
-              {t('checkout.country')}
+              {tSafe('checkout.country')}
             </label>
             <select
               id="country"
@@ -247,7 +262,7 @@ export default function AddressForm({ onSubmit, initialData = {} }: AddressFormP
 
           <div className="sm:col-span-2">
             <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
-              {t('checkout.phone')}
+              {tSafe('checkout.phone')}
             </label>
             <input
               type="tel"
@@ -276,14 +291,14 @@ export default function AddressForm({ onSubmit, initialData = {} }: AddressFormP
             className="h-4 w-4 text-amber-600 focus:ring-amber-500 border-gray-300 rounded"
           />
           <label htmlFor="sameAsBilling" className="ml-2 rtl:ml-0 rtl:mr-2 block text-sm text-gray-900">
-            {t('checkout.sameAsBilling')}
+            {tSafe('checkout.sameAsBilling')}
           </label>
         </div>
 
         {!sameAsBilling && (
           <div className="mt-6">
             <h3 className="text-lg font-medium text-gray-900 mb-4">
-              {t('checkout.billingAddress')}
+              {tSafe('checkout.billingAddress')}
             </h3>
             {/* Billing address fields would go here - similar to shipping */}
             {/* For brevity, I'm not repeating all fields */}
@@ -296,7 +311,7 @@ export default function AddressForm({ onSubmit, initialData = {} }: AddressFormP
           type="submit"
           className="bg-amber-600 border border-transparent rounded-md shadow-sm py-2 px-4 inline-flex justify-center text-sm font-medium text-white hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500"
         >
-          {t('common.next')}
+              {tSafe ? tSafe('common.next') : t('common.next')}
         </button>
       </div>
     </form>

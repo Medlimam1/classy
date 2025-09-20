@@ -7,19 +7,24 @@ async function main() {
   console.log('🌱 Starting seed...')
 
   // Create admin user
-  const hashedPassword = await bcrypt.hash('admin123', 12)
+  // Ensure an admin exists with the requested email. Use upsert to avoid duplicates.
+  const adminPassword = 'Strong!Pass123'
+  const hashedPassword = await bcrypt.hash(adminPassword, 12)
   const adminUser = await prisma.user.upsert({
-    where: { email: 'admin@classystore.mr' },
-    update: {},
+    where: { email: 'admin@example.com' },
+    update: {
+      // Ensure role remains ADMIN if user exists
+      role: 'ADMIN',
+    },
     create: {
-      email: 'admin@classystore.mr',
-      name: 'مدير المتجر',
+      email: 'admin@example.com',
+      name: 'Store Admin',
       password: hashedPassword,
       role: 'ADMIN',
     },
   })
 
-  console.log('✅ Admin user created:', adminUser.email)
+  console.log('✅ Admin user ensured:', adminUser.email)
 
   // Create categories
   const categories = [

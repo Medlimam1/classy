@@ -1,3 +1,5 @@
+"use client"
+
 import { useTranslations } from 'next-intl'
 import { formatPrice } from '@/lib/utils'
 
@@ -21,7 +23,7 @@ interface CartSummary {
       id: string
       name: string
       value: string
-      price: number
+      price?: number
     }
   }>
 }
@@ -69,7 +71,7 @@ export default function CheckoutSummary({ summary, locale }: CheckoutSummaryProp
                 </p>
               </div>
               <div className="text-sm font-medium text-gray-900">
-                {formatPrice(itemTotal, 'USD', locale)}
+                {formatPrice(itemTotal, undefined, locale)}
               </div>
             </div>
           )
@@ -80,13 +82,13 @@ export default function CheckoutSummary({ summary, locale }: CheckoutSummaryProp
       <div className="border-t border-gray-200 pt-4 space-y-2">
         <div className="flex justify-between text-sm text-gray-600">
           <span>{t('cart.subtotal')}</span>
-          <span>{formatPrice(summary.subtotal, 'USD', locale)}</span>
+          <span>{formatPrice(summary.subtotal, undefined, locale)}</span>
         </div>
 
         {summary.discount > 0 && (
           <div className="flex justify-between text-sm text-green-600">
             <span>{t('cart.discount')}</span>
-            <span>-{formatPrice(summary.discount, 'USD', locale)}</span>
+            <span>-{formatPrice(summary.discount, undefined, locale)}</span>
           </div>
         )}
 
@@ -95,20 +97,20 @@ export default function CheckoutSummary({ summary, locale }: CheckoutSummaryProp
           <span>
             {summary.shipping === 0 
               ? t('cart.freeShipping') 
-              : formatPrice(summary.shipping, 'USD', locale)
+              : formatPrice(summary.shipping, undefined, locale)
             }
           </span>
         </div>
 
         <div className="flex justify-between text-sm text-gray-600">
           <span>{t('cart.tax')}</span>
-          <span>{formatPrice(summary.tax, 'USD', locale)}</span>
+          <span>{formatPrice(summary.tax, undefined, locale)}</span>
         </div>
 
         <div className="border-t border-gray-200 pt-2">
           <div className="flex justify-between text-lg font-semibold text-gray-900">
             <span>{t('cart.total')}</span>
-            <span>{formatPrice(summary.total, 'USD', locale)}</span>
+            <span>{formatPrice(summary.total, undefined, locale)}</span>
           </div>
         </div>
       </div>

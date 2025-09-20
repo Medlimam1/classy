@@ -105,7 +105,7 @@ export default function OrderDetails({ order, locale }: OrderDetailsProps) {
                 {getStatusText(order.status)}
               </p>
               <p className="text-2xl font-bold text-gray-900">
-                {formatPrice(order.total, 'USD', locale)}
+                {formatPrice(order.total, undefined, locale)}
               </p>
             </div>
           </div>
@@ -175,10 +175,10 @@ export default function OrderDetails({ order, locale }: OrderDetailsProps) {
                   </div>
                   <div className="text-right">
                     <p className="text-lg font-semibold text-gray-900">
-                      {formatPrice(item.price * item.quantity, 'USD', locale)}
+                      {formatPrice(item.price * item.quantity, undefined, locale)}
                     </p>
                     <p className="text-sm text-gray-500">
-                      {formatPrice(item.price, 'USD', locale)} {t('orders.each')}
+                      {formatPrice(item.price, undefined, locale)} {t('orders.each')}
                     </p>
                   </div>
                 </div>
@@ -197,28 +197,28 @@ export default function OrderDetails({ order, locale }: OrderDetailsProps) {
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600">{t('cart.subtotal')}</span>
-                <span className="text-gray-900">{formatPrice(order.subtotal, 'USD', locale)}</span>
+                <span className="text-gray-900">{formatPrice(order.subtotal, undefined, locale)}</span>
               </div>
               {order.discount > 0 && (
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">{t('cart.discount')}</span>
-                  <span className="text-green-600">-{formatPrice(order.discount, 'USD', locale)}</span>
+                  <span className="text-green-600">-{formatPrice(order.discount, undefined, locale)}</span>
                 </div>
               )}
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600">{t('cart.shipping')}</span>
                 <span className="text-gray-900">
-                  {order.shipping === 0 ? t('cart.freeShipping') : formatPrice(order.shipping, 'USD', locale)}
+                  {order.shipping === 0 ? t('cart.freeShipping') : formatPrice(order.shipping, undefined, locale)}
                 </span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600">{t('cart.tax')}</span>
-                <span className="text-gray-900">{formatPrice(order.tax, 'USD', locale)}</span>
+                <span className="text-gray-900">{formatPrice(order.tax, undefined, locale)}</span>
               </div>
               <div className="border-t pt-2">
                 <div className="flex justify-between text-lg font-semibold">
                   <span className="text-gray-900">{t('cart.total')}</span>
-                  <span className="text-gray-900">{formatPrice(order.total, 'USD', locale)}</span>
+                  <span className="text-gray-900">{formatPrice(order.total, undefined, locale)}</span>
                 </div>
               </div>
             </div>
@@ -254,7 +254,7 @@ export default function OrderDetails({ order, locale }: OrderDetailsProps) {
                 <div key={payment.id} className="text-sm text-gray-600">
                   <p><strong>{t('orders.method')}:</strong> {payment.provider}</p>
                   <p><strong>{t('orders.status')}:</strong> {payment.status}</p>
-                  <p><strong>{t('orders.amount')}:</strong> {formatPrice(payment.amount, 'USD', locale)}</p>
+                  <p><strong>{t('orders.amount')}:</strong> {formatPrice(payment.amount, undefined, locale)}</p>
                   {payment.transactionId && (
                     <p><strong>{t('orders.transactionId')}:</strong> {payment.transactionId}</p>
                   )}

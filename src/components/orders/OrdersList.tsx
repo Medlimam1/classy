@@ -116,7 +116,7 @@ export default function OrdersList({ orders, locale }: OrdersListProps) {
               </div>
               <div className="text-right">
                 <p className="text-lg font-semibold text-gray-900">
-                  {formatPrice(order.total, 'USD', locale)}
+                  {formatPrice(order.total, undefined, locale)}
                 </p>
                 <p className="text-sm text-gray-500">
                   {order.items.length} {order.items.length === 1 ? 'item' : 'items'}
@@ -154,7 +154,7 @@ export default function OrdersList({ orders, locale }: OrdersListProps) {
                     </p>
                   </div>
                   <div className="text-sm font-medium text-gray-900">
-                    {formatPrice(item.price * item.quantity, 'USD', locale)}
+                    {formatPrice(item.price * item.quantity, undefined, locale)}
                   </div>
                 </div>
               ))}

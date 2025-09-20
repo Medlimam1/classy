@@ -32,6 +32,7 @@
   "navigation": {
     "shop": "المتجر",
     "categories": "الأقسام",
+    "openMenu": "فتح القائمة",
     "cart": "السلة",
     "account": "حسابي",
     "orders": "طلباتي",
@@ -121,6 +122,8 @@
   "cart": {
     "title": "سلة التسوق",
     "empty": "سلتك فارغة",
+    "enterCoupon": "أدخل رمز الكوبون",
+    "freeShipping": "شحن مجاني",
     "continueShopping": "متابعة التسوق",
     "checkout": "إتمام الطلب",
     "subtotal": "المجموع الفرعي",
@@ -133,11 +136,18 @@
     "applyCoupon": "تطبيق كوبون",
     "couponCode": "رمز الكوبون",
     "invalidCoupon": "رمز كوبون غير صحيح",
-    "couponApplied": "تم تطبيق الكوبون بنجاح"
+    "couponApplied": "تم تطبيق الكوبون بنجاح",
+    "orderSummary": "ملخص الطلب",
+    "discount": "الخصم"
+  },
+  "products": {
+    "addToCart": "أضف للسلة"
   },
   "checkout": {
     "title": "إتمام الطلب",
     "shippingAddress": "عنوان الشحن",
+    "review": "مراجعة الطلب",
+    "cashOnDelivery": "الدفع عند الاستلام",
     "billingAddress": "عنوان الفوترة",
     "sameAsBilling": "نفس عنوان الشحن",
     "paymentMethod": "طريقة الدفع",
@@ -170,13 +180,47 @@
     "shippingAddress": "عنوان الشحن",
     "billingAddress": "عنوان الفوترة",
     "paymentMethod": "طريقة الدفع",
-    "orderItems": "عناصر الطلب"
+    "orderItems": "عناصر الطلب",
+    "placedOn": "تم إنشاؤه في",
+    "statusNew": "جديد",
+    "statusPending": "قيد الانتظار",
+    "statusPaid": "مدفوع",
+    "statusFulfilled": "مكتمل",
+    "statusCancelled": "ملغي",
+    "orderPlaced": "تم وضع الطلب",
+    "paymentConfirmed": "تم تأكيد الدفع",
+    "orderDelivered": "تم تسليم الطلب",
+    "each": "لكل",
+    "orderSummary": "ملخص الطلب",
+    "paymentInformation": "معلومات الدفع",
+    "method": "الطريقة",
+    "amount": "المبلغ",
+    "transactionId": "معرّف العملية",
+    "shippingInformation": "معلومات الشحن",
+    "carrier": "شركة الشحن",
+    "trackingNumber": "رقم التتبع",
+    "shippedOn": "تاريخ الشحن"
   },
   "admin": {
+    "orders": {
+      "title": "الطلبات",
+      "id": "رقم الطلب",
+      "customer": "العميل",
+      "amount": "المبلغ",
+      "status": "الحالة",
+      "date": "التاريخ",
+      "empty": "لا توجد طلبات حتى الآن",
+      "statuses": {
+        "pending": "في الانتظار",
+        "completed": "مكتمل",
+        "cancelled": "ملغي",
+        "refunded": "مسترجع"
+      }
+    },
     "dashboard": "لوحة التحكم",
     "products": "المنتجات",
     "categories": "الأقسام",
-    "orders": "الطلبات",
+    "ordersLabel": "الطلبات",
     "customers": "العملاء",
     "coupons": "الكوبونات",
     "settings": "الإعدادات",

@@ -4,17 +4,28 @@ import { useState } from 'react'
 import { useStripe, useElements, PaymentElement } from '@stripe/react-stripe-js'
 import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
+import { useRouter } from 'next/navigation'
 
 interface PaymentFormProps {
   clientSecret: string
-  onSuccess: () => void
+  redirectPath?: string
 }
 
-export default function PaymentForm({ clientSecret, onSuccess }: PaymentFormProps) {
+export default function PaymentForm({ clientSecret, redirectPath }: PaymentFormProps) {
   const stripe = useStripe()
   const elements = useElements()
   const [isProcessing, setIsProcessing] = useState(false)
   const t = useTranslations()
+  // safe translation wrapper: next-intl throws when a key is missing in dev; fallback to the key
+  const tSafe = (key: string) => {
+    try {
+      return t(key)
+    } catch {
+      // swallow and return the key as a fallback to avoid crashing the client
+      return key
+    }
+  }
+  const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -35,13 +46,14 @@ export default function PaymentForm({ clientSecret, onSuccess }: PaymentFormProp
       })
 
       if (error) {
-        toast.error(error.message || t('checkout.paymentFailed'))
+        toast.error(error.message || tSafe('checkout.paymentFailed'))
       } else {
-        toast.success(t('checkout.paymentSuccess'))
-        onSuccess()
+        toast.success(tSafe('checkout.paymentSuccess'))
+        if (redirectPath) router.push(redirectPath)
       }
-    } catch (error: any) {
-      toast.error(error.message || t('checkout.paymentFailed'))
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err)
+      toast.error(message || tSafe('checkout.paymentFailed'))
     } finally {
       setIsProcessing(false)
     }
@@ -51,7 +63,7 @@ export default function PaymentForm({ clientSecret, onSuccess }: PaymentFormProp
     <form onSubmit={handleSubmit} className="space-y-6">
       <div>
         <h3 className="text-lg font-medium text-gray-900 mb-4">
-          {t('checkout.paymentDetails')}
+          {tSafe('checkout.paymentDetails')}
         </h3>
         <PaymentElement />
       </div>
@@ -64,7 +76,7 @@ export default function PaymentForm({ clientSecret, onSuccess }: PaymentFormProp
         {isProcessing ? (
           <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
         ) : (
-          t('checkout.completePayment')
+          tSafe('checkout.completePayment')
         )}
       </button>
     </form>
