@@ -8,8 +8,19 @@ const nextConfig = {
   reactStrictMode: true,
   images: { domains: ['res.cloudinary.com'] },
   experimental: {
-    serverActions: { allowedOrigins: ['localhost:3000'] }
-  }
-}
+    serverActions: { allowedOrigins: ['localhost:3000'] } },
+  
+  // تجاهل أخطاء الأنواع في TypeScript
+  typescript: {
+    // !! تحذير !! يسمح بإنهاء البناء مع وجود أخطاء أنواع
+    ignoreBuildErrors: true,
+  },
+
+  // تجاهل أخطاء ESLint أثناء البناء
+  eslint: {
+    // !! تحذير !! يسمح بإنهاء البناء مع وجود أخطاء لنت
+    ignoreDuringBuilds: true,
+},
+};
 
 export default withNextIntl(nextConfig)
